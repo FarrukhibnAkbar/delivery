@@ -39,6 +39,7 @@ func (h *Handler) SendCode(c *gin.Context) {
 	h.handleResponse(c, htp.OK, "Telefon raqamingizga 6 xonali kod yuborildi")
 }
 
+
 func (h *Handler) Registration(c *gin.Context) {
 	var req entities.RegistrReq
 	err := c.ShouldBindJSON(&req)
