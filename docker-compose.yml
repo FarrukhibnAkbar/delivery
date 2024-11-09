@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  # Go ilovasi konteyneri
+  app:
+    build: .  # Dockerfile orqali ilovani qurish
+    container_name: go_app
+    ports:
+      - "8080:8080"  # Go ilovasining portini ochish
+    networks:
+      - app_network
+    environment:
+      - DB_HOST=db  # PostgreSQL konteyneriga murojaat
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=12345
+      - DB_NAME=xozmak_db
+    volumes:
+      - ./logs:/var/log  # Loglarni host tizimiga yo‘naltirish
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"  # Log faylining maksimal o‘lchami
+        max-file: "3"    # Maksimal log fayllarining soni
+
+  # PostgreSQL konteyneri
+  db:
+    image: postgres:latest
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: xozmak_db
+    #   - "54331"
+    networks:
+      - app_network
+    ports:
+      - "54331:5432"  # PostgreSQL portini ochish
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data  # PostgreSQL ma’lumotlarini saqlash
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# Define the shared network
+networks:
+  app_network:
+    driver: bridge
+# Volume konfiguratsiyasi
+#volumes:
+#  pgdata:
+#    driver: local
