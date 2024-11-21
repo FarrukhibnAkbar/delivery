@@ -12,6 +12,7 @@ import (
 
 	_ "github.com/lib/pq"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type adminRepo struct {
@@ -237,9 +238,21 @@ func (a adminRepo) DeleteSubCategory(ctx context.Context, sub_categoryId string)
 	}
 
 	if res.RowsAffected == 0 {
-		return fmt.Errorf("no rows affected, category with ID %v not found or no changes made", sub_categoryId)
+		return fmt.Errorf("no rows affected, sub_category with ID %v not found or no changes made", sub_categoryId)
 	}
 	return nil
+}
+
+func (a adminRepo) AddFavorite(ctx context.Context, req entities.Favorite) error {
+    if err := a.db.Clauses(clause.OnConflict{
+        Columns:   []clause.Column{{Name: "user_id"}, {Name: "product_id"}},
+        DoUpdates: clause.Assignments(map[string]interface{}{
+            "is_favorited": gorm.Expr("NOT favorites.is_favorited"), 
+        }),
+    }).Create(&req).Error; err != nil {
+        return fmt.Errorf("error in Addfavorite upsert: %v", err)
+    }
+    return nil
 }
 
 

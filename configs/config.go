@@ -15,7 +15,6 @@ var (
 	once sync.Once
 )
 
-// Config loads configuration using atomic pattern
 func Config() *Configuration {
 	once.Do(func() {
 		conf = load()
@@ -23,7 +22,6 @@ func Config() *Configuration {
 	return conf
 }
 
-// Configuration ...
 type Configuration struct {
 	HTTPPort    string
 	LogLevel    string

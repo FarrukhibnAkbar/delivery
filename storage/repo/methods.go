@@ -24,4 +24,5 @@ type IAdminStorage interface {
 	GetSubCategory(ctx context.Context)([]entities.SubCategory, error)
 	UpdateSubCategory(ctx context.Context, req entities.SubCategory) error
 	DeleteSubCategory(ctx context.Context, sub_categoryId string) error
+	AddFavorite(ctx context.Context, req entities.Favorite) error
 }

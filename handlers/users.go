@@ -45,19 +45,19 @@ func (h *Handler) Registration(c *gin.Context) {
 	err := c.ShouldBindJSON(&req)
 
 	if err != nil {
-		h.handleResponse(c, htp.BadRequest, err.Error())
+		h.handleResponse(c, htp.BadRequest, logger.Error(err))
 		return
 	}
 
 	err = req.Validate()
 	if err != nil {
-		h.handleResponse(c, htp.BadRequest, err.Error())
+		h.handleResponse(c, htp.BadRequest, logger.Error(err))
 		return
 	}
 
 	resp, err := h.adminController.Registration(c, req)
 	if err != nil {
-		h.handleResponse(c, htp.InternalServerError, err.Error())
+		h.handleResponse(c, htp.InternalServerError, logger.Error(err))
 		return
 	}
 
@@ -68,7 +68,7 @@ func (h *Handler) InsertUserLocation(c *gin.Context) {
 	var location entities.UserLocation
 	err := c.ShouldBindJSON(&location)
 	if err != nil {
-		h.handleResponse(c, htp.BadRequest, err.Error())
+		h.handleResponse(c, htp.BadRequest, logger.Error(err))
 	}
 	userId, err := jwta.ExtractUserIDFromToken(c, []byte(h.cfg.JWTSecretKey))
 	if err != nil {
@@ -78,7 +78,7 @@ func (h *Handler) InsertUserLocation(c *gin.Context) {
 	location.UserID = userId
 	err = h.adminController.InsertUserLocation(c, location)
 	if err != nil {
-		h.handleResponse(c, htp.InternalServerError, err.Error())
+		h.handleResponse(c, htp.InternalServerError, logger.Error(err))
 		return
 	}
 	h.handleResponse(c, htp.OK, constants.Success)
@@ -87,19 +87,19 @@ func (h *Handler) InsertUserLocation(c *gin.Context) {
 func (h *Handler) UpdateProfile(c *gin.Context) {
 	var req entities.UserProfile
 	if err := c.ShouldBindJSON(&req); err != nil {
-		h.handleResponse(c, htp.BadRequest, err.Error())
+		h.handleResponse(c, htp.BadRequest, logger.Error(err))
 		return
 	}
 	userId, err := jwta.ExtractUserIDFromToken(c, []byte(h.cfg.JWTSecretKey))
 	if err != nil {
-		h.handleResponse(c, StatusFromError(err), err.Error())
+		h.handleResponse(c, StatusFromError(err), logger.Error(err))
 		return
 	}
-	req.ID=userId
+	req.ID = userId
 	req.UpdatedBy = userId
 	req.UpdatedAt = time.Now()
 	if err := h.adminController.UpdateUserProfile(c.Request.Context(), req); err != nil {
-		h.handleResponse(c, htp.InternalServerError, err.Error())
+		h.handleResponse(c, htp.InternalServerError, logger.Error(err))
 		return
 	}
 	h.handleResponse(c, htp.OK, "Profile updated successfully!")
@@ -134,7 +134,28 @@ func (h *Handler) GetUserLocation(c *gin.Context) {
 	h.handleResponse(c, htp.OK, data)
 }
 
+func (h *Handler) AddFavorite(c *gin.Context) {
+	var body entities.Favorite
 
+	err := c.ShouldBindJSON(&body)
+	if err != nil {
+		h.handleResponse(c, htp.BadRequest, logger.Error(err))
+	}
+	userId, err := jwta.ExtractUserIDFromToken(c, []byte(h.cfg.JWTSecretKey))
+	if err != nil {
+		h.handleResponse(c, htp.InternalServerError, "Invalid or expired token")
+		return
+	}
+	body.UserID = userId
+
+	err = h.adminController.AddFavorite(c, body)
+	if err != nil {
+		h.handleResponse(c, htp.InternalServerError, logger.Error(err))
+		return
+	}
+	h.handleResponse(c, htp.OK, constants.Success)
+
+}
 
 // func (h *Handler) Login(c *gin.Context) {
 // 	loginReq := entities.LoginReq{}

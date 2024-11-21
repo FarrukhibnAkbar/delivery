@@ -10,4 +10,7 @@ func(r Router) UserRouters() {
 	authGroup.POST("/location", r.handler.InsertUserLocation)
 	authGroup.GET("/location", r.handler.GetUserLocation)
 
+	productGroup := r.router.Group("/api")
+	productGroup.POST("/favorite", r.handler.AddFavorite)
+
 }
