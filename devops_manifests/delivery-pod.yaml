@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: delivery
+  namespace: farrux-test
+  labels:
+    app: delivery
+spec:
+  containers:
+  - name: delivery
+    image: gitlab.udevs.io:5050/farrux-test/delivery:latest
+    ports:
+    - containerPort: 8080
+  imagePullSecrets:
+      - name: gitlab-registry
