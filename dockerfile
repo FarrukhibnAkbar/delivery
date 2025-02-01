@@ -11,6 +11,5 @@ RUN go build -o main .
 
 # 8080 portini ochish
 EXPOSE 8080
-
 # Ilovani ishga tushurish
 CMD ["./main"]
